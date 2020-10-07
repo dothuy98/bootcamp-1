@@ -5,12 +5,14 @@ bootcampプログラムのgitについて昨日に引き続きを行った。(�
 ・具体的なcommit、pushの方法。またその取り消し方。
 ・git diffの詳しい使い方について
 ・.gitignoreについて、書き方やその使いどころをまとめた。
-CheckPointの内容についても取り掛かった。(ブランチ名 : git_CheckPoint)
-・README.mdを編集後、push(ブランチ名 : edit_README)
-・logディレクトリについて
+CheckPointの内容についても取り掛かった。(ブランチ名 : git_CheckPoint -> 変更後 : learn_github_flow_and_PR)
+ファイル名 : pull_request_memo.txt
 ・プルリクエストの方法について
-・github flowについて
 ・プルリクエストのレビュー対象が想定通りかの確認方法。
+ファイル名 : github_flow.txt
+・github flowについて
+(ブランチ名 : edit_README -> 変更後 : edit_README_modified)
+・README.mdを編集後、push
 
 学んだこと : 
 gitでは引数を指定しなくてもデフォルトで決められら引数と解釈し、コマンドを実行してくれる機能があるが、ミスの原因になる可能性があるため必ず引数を明示的に指定してコマンドを実行しようと考えた。
