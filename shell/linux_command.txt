@@ -8,13 +8,14 @@ print working directoryの略。
 -P : シンボリックリンクを含まないパスを出力する。
   　　両方のオプションを指定した場合、最後に指定されたものを使用する。
 （実行例）
+$ ln -s test/dir1
+$ cd dir1
 $ pwd
 > /home/afushimi/dir1
 $ pwd -L
 > /home/afushimi/dir1
 $ pwd -P
 > /home/afushimi/test/dir1
-※afushimiのディレクトリ内において`ln -s test/dir1`でシンボリックリンクを作成したため
 
 cd :
 change directoryの略。
@@ -73,7 +74,7 @@ mkdir :
 make directoryの略。
 ディレクトリを作成する。
 （オプション)
--p : 必要に王してサブディレクトリを作成する。
+-p : 必要に応じてサブディレクトリを作成する。
 （実行例）
 $ mkdir dir
 $ cd dir
