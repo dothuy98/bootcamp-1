@@ -1,0 +1,129 @@
+pwd :
+print working directoryの略。
+カレントディレクトリのフルパスを出力してくれるコマンド。
+（オプション）
+-L : シンボリックリンクを含むパスの場合、シンボリックリンクのパスを出力する。
+     デフォルトで有効になっている。
+  　 シンボリックリンクはwindowsのショートカットの作成によく似た形式のファイルでln -s <file name>で作成できる。
+-P : シンボリックリンクを含まないパスを出力する。
+  　　両方のオプションを指定した場合、最後に指定されたものを使用する。
+（実行例）
+$ pwd
+> /home/afushimi/dir1
+$ pwd -L
+> /home/afushimi/dir1
+$ pwd -P
+> /home/afushimi/test/dir1
+※afushimiのディレクトリ内において`ln -s test/dir1`でシンボリックリンクを作成したため
+
+cd :
+change directoryの略。
+移動するディレクトリパスを指定する。
+絶対パス、相対パスで移動できる。
+1つ前のパスに戻る場合は../dirのようにする。
+`cd`もしくは`cd ~`でホームディレクトリに移動できる。
+`cd -`で直前の作業ディレクトリに移動できる。
+（オプション）
+-L : 移動先がシンボリックリンクの場合はシンボリックリンクに移動する。
+     `cd ..`を行うとシンボリックリンクに移動するまえのディレクトリに移動する。
+-P : 移動先がシンボリックの場合、シンボリックリンクのターゲットに飛ぶ。
+　　　`cd ..`した場合、ターゲット先の1つ前のディレクトリに移動する。
+※どちらもシンボリックリンクでない移動先の場合には挙動は変わらない。
+(実行例）
+$ cd dir1/
+$ pwd
+> home/afushimi/dir1
+$ cd -L dir1/
+$ pwd
+> home/afushimi/dir1
+$ cd -P dir1/
+$ pwd
+> home/afushimi/test/dir1
+
+ls :
+list segmentsの略。セグメント（ファイル）をリストするという意味。
+ディレクトリの内容を表示する。
+色分けとして自分の環境のデフォルトでは、赤が圧縮ファイル、青がディレクトリ、水色がシンボリックリンク、白（黒）がデフォルトなど様々な色分けがされている。
+また、色分けは変更できる。
+（オプション）
+-a : .で始まるファイル（隠しファイル）も表示する。
+-l : ロングフォーマットで出力する。
+     順番としてはアクセス権，ブロック数，所有者名，グループ名，サイズ，修正時刻，ファイル名またはディレクトリ名となる。
+-1 : 1行に1列で表示する。
+-m : コンマ(,)区切りで出力する。
+-R : サブディレクトリ(ディレクトリの中のファイル、ディレクトリ)を再帰的に出力する。
+※オプションは-laのように-の後に続けてオプションを指定できる。
+（実行例）
+$ ls
+> git  log  README.md  shell
+$ ls
+> .  ..  git  .git  log  README.md  shell
+$ ls -la
+>
+total 28
+drwxrwxr-x 6 afushimi afushimi 4096 Oct  8 16:42 .
+drwxr-xr-x 9 afushimi afushimi 4096 Oct  8 16:44 ..
+drwxrwxr-x 2 afushimi afushimi 4096 Oct  8 16:37 git
+drwxrwxr-x 8 afushimi afushimi 4096 Oct  8 16:37 .git
+drwxrwxr-x 3 afushimi afushimi 4096 Oct  7 12:48 log
+-rw-rw-r-- 1 afushimi afushimi   11 Oct  8 13:18 README.md
+drwxrwxr-x 2 afushimi afushimi 4096 Oct  8 16:37 shell
+
+mkdir :
+make directoryの略。
+ディレクトリを作成する。
+（オプション)
+-p : 必要に王してサブディレクトリを作成する。
+（実行例）
+$ mkdir dir
+$ cd dir
+$ pwd
+> /home/afushimi/dir
+$ mkdir dirA/dirB/dirC
+mkdir: cannot create directory ‘dirA/dirB/dirC’: No such file or directory
+# -pオプションを付けるとディレクトリがない場合は作成してくれる。
+$ mkdir -p dirA/dirB/dirC
+$ cd dirA/dirB/dirC/
+$ pwd
+> /home/afushimi/dirA/dirB/dirC
+
+touch :
+そのままtouchの意味。
+ファイルの最終アクセス日時と最終更新日時を変更する。
+ファイルがない場合は新しいファイルを作成する。
+新しい空ファイルを作成する際によく使用される。
+（実行例）
+$ mkdir log
+$ cd log
+$ touch .gitkeep
+
+rm :
+removeの略。
+ファイル・ディレクトリを削除する場合に使用する。
+windowsのようにゴミ箱にいったん貯めてから削除しないため注意が必要。
+（オプション）
+-r : ディレクトリも削除の対象にする。
+-f : エラーメッセージを表示させずに強制的に削除
+     通常、ディレクトリを削除する際に中にファイルが存在する場合には確認が入るがそれも無視するため注意が必要
+（実行例）
+$ ls
+> test.txt
+$ rm test.txt
+$ ls
+> 
+
+mv :
+moveの略。
+ファイル・ディレクトリの移動やリネームを行うことができる。
+（オプション）
+-f : 移動先に同名ファイルがあっても確認せず上書きする。
+-n : 既存ファイルの上書きをしない。（万が一、上書きしてしまうと大変なので毎回つけると安心かもしれない）
+-b : 上書きするファイルのバックアップを作成する。
+(実行例)
+$ mv test.txt test_group
+$ cd test_group
+$ ls
+> test.txt
+$ mv test.txt file.txt
+$ ls
+> file.txt
