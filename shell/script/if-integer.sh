@@ -44,21 +44,21 @@ fi
 # 例3 小数一致
 # if文ではtestコマンドが使用されており、真(1)、偽(0)の終了ステータスのみを返している。
 # また、testコマンドでは小数比較を扱えない。
-numberA=0.3
-numberB=0.3
-if [ `echo "$numberA == $numberB" | bc` == 1 ]; then
-  echo "$numberA == $numberB"
+number_a=0.3
+number_b=0.3
+if [ `echo "$number_a == $number_b" | bc` == 1 ]; then
+  echo "$number_a == $number_b"
 else
-  echo "$numberA != $numberB"
+  echo "$number_a != $number_b"
 fi
 # 例4 小数の足し算をした結果の一致
-numberA=`echo "scale=1000; 0.1 + 0.1 + 0.1" | bc`
+number_a=`echo "scale=1000; 0.1 + 0.1 + 0.1" | bc`
 # scaleで小数点以下の出力桁を制御。
-numberB=0.3
-if [ `echo "$numberA == $numberB" | bc` == 1 ]; then
-  echo "$numberA == $numberB"
+number_b=0.3
+if [ `echo "$number_a == $number_b" | bc` == 1 ]; then
+  echo "$number_a == $number_b"
 else
-  echo "$numberA != $numberB"
+  echo "$number_a != $number_b"
 fi
 
 # pythonなどで0.1+0.1+0.1を行うと2進数では完全に小数を表現できない関係で0.30000000000000004などが出力されるがそうならない。
