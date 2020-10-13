@@ -1,12 +1,17 @@
 #!/bin/bash
 
+# ガード節 : コードやループの先頭で例外（異常系）を記述し、ループを抜ける・処理を終了させるといった例外処理をわかりやすく記述する方法。
+# メリットとしてネストが減り正常系の処理がわかりやすくなり、一か所に例外が集まるためコードを読む人が理解しやすくなる。
 if [ $# == 0 ]; then
   echo "引数はありません。"
-else
-  echo "引数の数は$#個"
-  for index in `seq 1 $#`
-  do
-    # ${!value1} : 変数の変数を指定。${value[${value1}]}と同じ意味
-    echo "\$${index} : ${!index}"
-  done
+  return 0
+  # returnやcontinue、breakを積極的に記述することでそれ以降を読み飛ばせる場合が増え、読みやすくなる。
 fi
+# return 0 とexitの違い : exitはプログラム（現在のプロセス自体）を終了し、returnは関数を終了させる意味があるがshell scriptではほぼ違いがない。
+
+echo "引数の数は$#個"
+for index in `seq 1 $#`
+do
+  # ${!value1} : 変数の変数を指定。${value[${value1}]}と同じ意味
+  echo "\$${index} : ${!index}"
+done
