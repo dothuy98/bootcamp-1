@@ -1,6 +1,11 @@
+parameter is "ok" > 
 okを認識しました
+parameter is "ng" > 
 ngを認識しました
+parameter is "ok ng" > 
 warning : 引数が２つ以上の場合は１番目の引数を使用します。
 okを認識しました
+parameter is "xxx" > 
 引数がok,ng以外のものです。
+parameter is "1" > 
 引数がok,ng以外のものです。
