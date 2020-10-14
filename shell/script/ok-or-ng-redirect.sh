@@ -19,6 +19,9 @@ now=`date '+%y/%m/%d %H:%M:%S'`
 if [ $1 == "ng" ]; then
   echo "ngを認識しました"
   echo "$now : $0に引数で\"ng\"が渡されました" 2> ng.txt >&2 
+  # more simple error message
+  # こちらの方では標準出力をエラーにするという処理がないためわかりやすい。
+  cd xxxx 2>> ng.txt
   exit 1
 fi
 
