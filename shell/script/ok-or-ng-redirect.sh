@@ -10,6 +10,10 @@ if ! [ $1 == "ok" -o $1 == "ng" ]; then
   echo "引数がok,ng以外のものです。" >&2
   exit 1
 fi
+ 
+if [ $# -gt 1 ]; then
+  echo "warning : 引数が２つ以上の場合は１番目の引数を使用します。" >&2
+fi
 
 now=`date '+%y/%m/%d %H:%M:%S'`
 if [ $1 == "ok" ]; then
