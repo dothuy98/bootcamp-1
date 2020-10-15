@@ -31,11 +31,11 @@ do
   # 乱数出力
   # $((RANDOM % 上限値 + 開始値))で設定できる
   directoryNumber=$((RANDOM % ${firstParameter[0]} + 1))
-  countFile=`ls out/dir$directoryNumber -1 | wc -l`
+  countFile=`ls out/dir-$directoryNumber -1 | wc -l`
   if [ $countFile != $directoryNumber ]; then
     echo "ファイルの個数が違う"
   fi
-  echo "dir$directoryNumber内のファイル一覧"
-  echo `ls out/dir$directoryNumber`
+  echo "dir-$directoryNumber内のファイル一覧"
+  echo `ls out/dir-$directoryNumber`
   echo -e "ファイルの個数も正しい\n"
 done

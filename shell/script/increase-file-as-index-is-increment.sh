@@ -25,10 +25,10 @@ fi
 
 for directoryIndex in `seq 1 $1`
 do
-  mkdir out/dir$directoryIndex
+  mkdir out/dir-$directoryIndex
   for fileIndex in `seq 1 $directoryIndex`
    do
-      touch out/dir$directoryIndex/file$fileIndex
+      touch out/dir-$directoryIndex/file-$fileIndex
    done
 done
 
