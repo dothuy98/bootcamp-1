@@ -29,8 +29,8 @@ do
   echo "ディレクトリの個数は正しい。"
     
   # 乱数出力
-  # $((_r_a_n_d_o_m % 上限値 + 開始値))で設定できる
-  directory_number=$((_r_a_n_d_o_m % ${first_parameter[0]} + 1))
+  # $((RANDOM % 上限値 + 開始値))で設定できる
+  directory_number=$((RANDOM % ${first_parameter[0]} + 1))
   count_file=`ls out/dir-$directory_number -1 | wc -l`
   if [ $count_file != $directory_number ]; then
     echo "ファイルの個数が違う"
