@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function checkParameter () {
+function check_parameter () {
   if [ $1 == 0 ]; then
     echo "引数を設定してください" >&2
     exit 1
