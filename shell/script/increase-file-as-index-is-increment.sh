@@ -2,7 +2,7 @@
 
 . ./check-parameter.sh
 # 引数での例外処理でいつも同じコードを書いてしまうため関数化し、別ファイルにまとめた。
-checkParameter $#
+check_parameter $#
 
 if [[ $1 =~ [^0-9] ]]; then
   echo "引数に正の整数値を半角で指定してください"
@@ -23,12 +23,12 @@ if [ $1 == 0 ]; then
   exit 0
 fi
 
-for directoryIndex in `seq 1 $1`
+for directory_index in `seq 1 $1`
 do
-  mkdir out/dir-$directoryIndex
-  for fileIndex in `seq 1 $directoryIndex`
+  mkdir out/dir-$directory_index
+  for file_index in `seq 1 $directory_index`
    do
-      touch out/dir-$directoryIndex/file-$fileIndex
+      touch out/dir-$directory_index/file-$file_index
    done
 done
 
