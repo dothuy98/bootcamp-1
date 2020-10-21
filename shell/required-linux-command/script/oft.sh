@@ -98,7 +98,7 @@ do
       read replace
       line=`echo "${line}" | sed -e "s/$read_delimiter/$replace/"`
     done
-    echo "${line}" >> ft-output.txt
+    echo -e "${line}" >> ft-output.txt
     continue
   fi    
   # 置換文字がないのでそのまま
