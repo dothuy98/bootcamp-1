@@ -34,11 +34,11 @@ p hash
 p 'reject'
 # 条件を評価した結果、真である要素を削除したhashを返す。削除できなかった場合はnilを返すがdelite_ifは常にselfを返す
 hash = {'1': 2, 3 => 9}
-p hash.reject {|_key, value| value.even? }
+p hash.reject { |_key, value| value.even? }
 
 p 'each_key'
 hash = {'1' => 2, '7' => 5}
-hash.each_key {|k| p k.to_i**2 }
+hash.each_key { |k| p k.to_i**2 }
 
 p 'invert'
 # keyとvalueを入れ替える
@@ -49,7 +49,7 @@ p 'merge'
 # hashの内容をマージした結果を返す。重複したキーがある場合はブロックの内容にしたがって処理する。
 p hash = {a: 3, b: 1}
 p hash.merge({c: 1, d: 3})
-p hash.merge({a: 10, b: 1}) {|_key, old_val, new_val| old_val + new_val }
+p hash.merge({a: 10, b: 1}) { |_key, old_val, new_val| old_val + new_val }
 
 p 'rassoc'
 # assocと異なりvalueで探索し、配列で返す。
@@ -71,7 +71,7 @@ p 'sort'
 hash = {b: 1, a: 2, c:0}
 p hash.sort.to_h
 # valueでソート
-p hash.sort_by {|_, v| v }.to_h
+p hash.sort_by { |_, v| v }.to_h
 
 p 'transform_key'
 # すべてのkeyに対してブロックで指定した条件のもと変更を行う。
