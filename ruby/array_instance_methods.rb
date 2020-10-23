@@ -48,7 +48,7 @@ puts "\n"
 p 'dig'
 # 途中のオブジェクトがnilでもエラーをださない。
 p [(1..3).to_a,nil,(1...10).to_a]
-p [[*1..3],nil,[*1...10]].dig(1, 0)
+p [[*1..3], nil, [*1...10]].dig(1, 0)
 
 p 'select'
 # 条件が真になった場合の要素のみを戻り値として返す。
@@ -96,7 +96,7 @@ p array
 
 p 'product'
 # レシーバーと引数で要素を1つずつとり、新しい要素を作成する。複数の引数を指定することもできる。
-[*0..3].product([*'a'..'d']).each { |string1, string2| print"#{string1}#{string2}, " }
+[*0..3].product([*'a'..'d']).each { |string1, string2| print "#{string1}#{string2}, " }
 puts "\n"
 
 p 'rotate'

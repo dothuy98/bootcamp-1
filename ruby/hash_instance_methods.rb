@@ -24,7 +24,7 @@ p hash.compact
 
 p 'default'
 # default値を返す。
-hash = Hash.new{|hash, key| hash[key] = '3'}
+hash = Hash.new { |hash, key| hash[key] = '3' }
 # keyが指定場合のみデフォルト値を持つ
 p hash.default(:a)
 p hash.default
