@@ -85,7 +85,7 @@ p 'Taro'.chars.last
 
 p 'permutation'
 # 指定した引数のサイズの順列をEnumerator オブジェクトとして返す。
-'john'.chars.permutation(4).each {|string| print "#{string.join}, " }
+'john'.chars.permutation(4).each { |string| print "#{string.join}, " }
 puts "\n"
 
 p 'pop'
