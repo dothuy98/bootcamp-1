@@ -1,66 +1,53 @@
-require 'optparse'
 module ArgvSplitable
-  def parse_options(argv)
-  option = OptionParser.new
-  self.class.module_eval do
-      define_method(:usage) do |message = nil|
-        puts option.to_s
-        puts "error : #{message}" if message
-        exit 1
+  HOW_TO_USE = <<~USAGE
+Usage: trash_handler [options] ARGV
+    -r, --restore VALUE              restore file to original position from ~/.trash 
+    -v, --view                       view file in .trash
+    -c, --compress [VALUE]           determine compress methods to file or directory 
+    -d, --delete VALUE               delete file or directory in ~/.trash 
+    -a, --all_delete                 delete all file and directory in ~/.trash
+USAGE
+
+  def check_exception(array)
+    raise HOW_TO_USE if array.empty?
+  end
+  
+  def extract_filename(array)
+    array[0].chomp("/") if /^[^-]/.match(array[0]) && exist_file?(array[0])
+  end
+  
+  def exist_file?(file_name)
+    raise "error: no such file or directory" unless File.exist?(file_name)
+    true
+  end
+  
+  def extract_options(array)
+    options = array.map.with_index do |value, index| 
+      next if /^[^-]/.match(value)
+      case value
+      when "-r","--restore"
+        err_value(value) unless array[index + 1]
+        [:restore, array[index + 1].chomp("/")]
+      when "-d", "--delete"
+        [:delete, array[index + 1].chomp("/")]
+        err_value(value) unless array[index + 1]
+      when "-c", "--compress"
+        [:compress, array[index + 1] || 'zip']
+      when "-v","--view"
+        [:view_list, true]
+      when "--delete-all"
+        [:delete_all, true]
+      else
+        raise "error: unknown predicate `#{value}'"
       end
     end
-
-    options = {
-      restore: "",
-      view_list: false,
-      compress_method: "",
-      delete_file: "",
-      all_delete: false
-    }
-
-    option.on('-r','--restore VALUE', "restore file to original position from ~/.trash (default: #{options[:restore]}") do |value| 
-      options[:restore] = delete_end_slash(value)
-    end
-    option.on('-v','--view', "view file in .trash (default: #{options[:view_list]}") do |value| 
-      options[:view_list] = value
-    end
-    option.on('-c', '--compress [VALUE]', "compress file or directory (default: #{options[:compress_method]}" ) do |value|
-      options[:compress_mothod] = value.nil? ? "zip" : value
-    end
-    option.on('-d', '--delete VALUE', "delete file or directory in ~/.trash (default: #{options[:delete_file]}" ) do |value|
-      options[:delete_file] = delete_end_slash(slash)
-    end
-    option.on('-a', '--all_delete', "delete all file and directory in ~/.trash (default #{options[:all_delete]}" ) do |value|
-      options[:all_delete] = value
-    end
+    #p options.compact.empty?
     
-    option.banner += ' ARGV'
-
-    begin
-      arguments = option.parse(argv)
-    rescue OptionParser::InvalidOption => error
-      usage(error.message)
-    end
-    
-    if ARGV.size.zero?
-      usage('number of arguments and options is zero')
-    end
-
-    if arguments.size > 1
-      usage('number of argumentes is more than 1')
-    end
-    
-    arguments = arguments.map { |value| delete_end_slash(value) }
-    
-    [options, arguments]
+    options.compact.empty? ? {} : options.compact.to_h
   end
   
-  # 引数の前処理を記述
-  def delete_end_slash(value)
-    value.chomp! if value[-1] == "/"
-    value
+  def err_value(option)
+    raise "error: #{option} option's value is not exist"
   end
-  
-  # そのファイルが存在しているかどうかでerror
   
 end
