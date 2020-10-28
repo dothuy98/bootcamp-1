@@ -1,5 +1,4 @@
 require 'fileutils'
-require './lib/conversionable'
 require './lib/csv_editable'
 
 class TrashHandler
@@ -7,12 +6,11 @@ class TrashHandler
 Usage: trash_handler [options] ARGV
     -r, --restore VALUE              restore file to original position from ~/.trash 
     -v, --view                       view file in .trash
-    -c, --compress VALUE             determine compress methods to file or directory 
+    -c, --compress                   compress file or directory by zip format
     -d, --delete VALUE               delete file or directory in ~/.trash 
     --delete-all                     delete all file and directory in ~/.trash
 USAGE
 
-  include Conversionable
   include CsvEditable
 
   attr_reader :array
@@ -24,8 +22,8 @@ USAGE
   end
   
   def run
-    @array.map.with_index do |value, index| 
-      PutTrash.new(value).run(find_compress(array)) if index == 0 && /^[^-]/.match(value)
+    @array.each_with_index do |value, index| 
+      PutTrash.new(value).run(find_compress) if index == 0 && /^[^-]/.match(value)
       next if /^[^-]/.match(value)
       case value
       when "-r","--restore"
@@ -36,8 +34,9 @@ USAGE
         Delete.new(check_exist(array[index + 1])).run
       when "--delete-all"
         Delete.new.all
+      when "-c","--compress"
       else
-        raise "error: unknown predicate `#{value}'"
+        raise "\nerror: unknown predicate `#{value}'"
       end
     end
   end
@@ -45,48 +44,27 @@ USAGE
   private
   
   def check_exception(array)
-    raise HOW_TO_USE if array.empty?
+    puts HOW_TO_USE if array.empty?
   end
   
   def find_compress
     return nil if @array.find_index { |value| value == "-c" || value == "--compress" }.nil?
-    @array[@array.find_index { |value| value == "-c" || value == "--compress" } + 1]
+    # 複数の圧縮形式に対応する場合
+    # @array[@array.find_index { |value| value == "-c" || value == "--compress" } + 1]
+    'zip'
   end
   
   def check_exist(value)
-    raise "error: that element is not found" if value.nil?
-  end
-  
-  def confirm_restore(file)
-    puts "#{file}move this file to original path ? [ y / n ]"
-    restore(only_name(file)) if STDIN.gets.chomp("\n") == "y"
-  end
-  
-  def move_to_trash(file_name)
-    FileUtils.mv(file_name, "#{TRASH_PATH}")
-  end
-  
-  
-  def trash_has?(file_name)
-    raise "error: no such file or directory in ~/.trash" unless File.exist?("#{TRASH_PATH}/#{file_name}")
-    true
+    raise "\nerror: that element is not found" if value.nil?
+    raise "\nerror: that directory or file is not exist in ~/.trash" if count_samefile(value) == 0
+    value
   end
 
-
-  
-  def compress
-    # すでに圧縮されているファイルは圧縮しない
-  end
-
-  def decompress
-    # コマンド実行前から圧縮されたいるファイルは解凍しない。
-  end
 end
 
 class PutTrash
   TRASH_PATH = "#{Dir.home}/.trash"
   
-  include Conversionable
   include CsvEditable
   
   attr_reader :file_name
@@ -97,53 +75,41 @@ class PutTrash
   end
   
   def check_exception(file_name)
-    raise "error: no such file or directory in current directory" if File.exist?(file_name)
+    raise "\nerror: no such file or directory in current directory" unless File.exist?(file_name)
   end
   
   def run(method)
-    # compress -> ファイル名ごと破壊的に変更
-    compress(method,@file_name)
-    File.rename(@file_name, modify(@file_name))
-    FileUtils.mv(modify(@file_name), TRASH_PATH)
-    write([modify(@file_name),Dir.pwd,compressed])
-    puts "saved file as #{modify(@file_name)} because same file name exist" unless modify(@file_name) == file_name
+    @file_name = Compress.new(method).run(@file_name)
+    File.rename(@file_name, modify)
+    FileUtils.mv(modify, TRASH_PATH)
+    puts "saved file as '#{modify}' because same file name exist" unless modify == @file_name
+    write([modify, Dir.pwd, method.nil? ? false : true])
   end
 
   private
   
   def modify
     return @file_name if count_samefile(@file_name) == 0
-    @file_name.clone.insert(@file_name.index(".") || -1, "(#{count_samefile(@file_name)})")
+    @file_name.dup.insert(@file_name.index(".") || -1, "(#{count_samefile(@file_name)})")
   end
   
-
 end
 
 class Restore
-  include Conversionable
+  TRASH_PATH = "#{Dir.home}/.trash" 
+  
   include CsvEditable
   
   attr_reader :file_name
   
   def initialize(file_name)
-    check_exception(file_name)
     @file_name = file_name
   end
   
-  def run_restore(file_name)
-    raise "error: error: no such file or directory in ~/.trash" if count_samefile(file_name) == 0
-    restore(file_name) if count_samefile(file_name) == 1
-    get_samefiles(file_name).each { |file| confirm_restore(file) } unless count_samefile(file_name) == 1
-  end
-  
-  def restore(file_name)
-    move_from_trash(file_name)
-    write_new_index(erase(file_name))
-    # 移動してから解凍
-  end
-  
-  def move_from_trash(file_name)
-    FileUtils.mv("#{TRASH_PATH}/#{file_name}", refer_original_path(file_name))
+  def run
+    system("mv #{TRASH_PATH}/#{@file_name} #{find_path(@file_name)}")
+    Uncompress.new("#{find_path(@file_name)}/#{@file_name}").run if find_compressed?(@file_name)
+    write_2d_arr(select_other_than(@file_name))
   end
 end
 
@@ -152,36 +118,80 @@ class Delete
   
   attr_reader :file_name
   
-  def initialize(file_name)
-    check_exception(file_name)
+  def initialize(file_name = "default")
     @file_name = file_name
   end
   
-  def run(file_name)
-    
+  def run
+    FileUtils.rm_r("#{TRASH_PATH}/#{@file_name}")
+    write_2d_arr(select_other_than(@file_name))
   end
   
   def all
-    puts "Do you really all remove? [ y / n ]"
-    FileUtils.rm_r(TRASH_PATH) if STDIN.gets.chomp("\n") == "y"
+    FileUtils.rm_r(TRASH_PATH)
   end
 end
 
 class ViewList
   include CsvEditable
   
-  def run_view_list
-    make_trash
-    puts "~/.trash has not file or directory" if read_csv.empty?
-    view_list unless read_csv.empty?
-  end
-  
-  def view_list
-    puts "file name\toriginal position"
-    puts read_csv
+  def run
+    return "~/.trash has not file or directory" if read.empty?
+    puts read.map { |array| array.join("\t") }
   end
 end
 
+class Compress
+  attr_reader :method
+  
+  def initialize(method)
+    @method = method.nil? ? 'none' : method
+  end
+  
+  def run(file_name)
+    return file_name if @method == "none"
+    case method
+    when "zip"
+      system("zip -r #{add_extension(file_name)} #{file_name}")
+    else
+      raise "does not support this compression method"
+    end
+    add_extension(file_name)
+  end
+  
+  private
+  
+  def add_extension(file_name)
+    return file_name if @method == "none"
+    "#{file_name}.#{@method}"
+  end
+end
+
+class Uncompress
+  EXTENSIONS = %w[zip]
+  
+  attr_reader :file_name
+  
+  def initialize(file_name)
+    @file_name = file_name
+  end
+  
+  def run
+    raise "\nerror: unsupported extension" unless EXTENSIONS.include?(only_extension(@file_name))
+    case only_extension(@file_name)
+    when "zip"
+      system("unzip #{file_name}")
+    end
+  end
+  
+  private
+  
+  def only_extension(file_name)
+    file_name.gsub(/.*\./,'')
+  end
+end
+
+
 if __FILE__ == $0
-  TrashHandler.new(ARGV).execute
+  TrashHandler.new(ARGV).run
 end
