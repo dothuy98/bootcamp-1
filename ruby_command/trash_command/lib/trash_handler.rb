@@ -168,8 +168,6 @@ class Compress
 end
 
 class Uncompress
-  EXTENSIONS = %w[zip]
-  
   attr_reader :file_name
   
   def initialize(file_name)
@@ -177,10 +175,11 @@ class Uncompress
   end
   
   def run
-    raise "\nerror: unsupported extension" unless EXTENSIONS.include?(only_extension(@file_name))
     case only_extension(@file_name)
     when "zip"
       system("unzip #{file_name}")
+    else
+      raise "\nerror: unsupported extension"
     end
   end
   
