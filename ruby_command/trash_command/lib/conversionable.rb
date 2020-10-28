@@ -1,2 +1,2 @@
-module Compressable
+module Conversionable
 end
