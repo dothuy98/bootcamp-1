@@ -8,7 +8,7 @@ class TrashHandler
   CSV_PATH = "#{TRASH_PATH}/trashed_log.csv"
   HEADER = ['file_name', 'original_path','compressed']
   
-  attr_accessor :trashed_file, :method, :log
+  attr_accessor :method, :log
   
   def initialize(options: [])
     build_settings
