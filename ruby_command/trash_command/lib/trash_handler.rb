@@ -44,7 +44,7 @@ USAGE
       when "--delete-all"
         delete_all
       else
-        raise "error: unknown predicate `#{value}'"
+        raise "error: unknown predicate `#{parameters}'"
       end
     end
   end
