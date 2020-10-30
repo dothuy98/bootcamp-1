@@ -2,12 +2,11 @@ class TrashedFile
   
   TRASH_PATH = "#{Dir.home}/.trash"
   
-  attr_accessor :file_name, :file_path, :method
+  attr_accessor :file_name, :file_path
   
-  def initialize(file_name, file_path = nil, method = nil)
+  def initialize(file_name, file_path = nil)
     @file_name = file_name
     @file_path = file_path
-    @method = method
   end
   
   def move_to(file_path)
@@ -16,17 +15,6 @@ class TrashedFile
   
   def delete
     FileUtils.rm_r(@file_name)
-  end
-  
-  def compress
-    raise "error: unsupported method" unless @method == 'zip'
-    file_name = "#{TRASH_PATH}/#{@file_name}"
-    system("zip -r #{file_name + '.' + @method} #{file_name}")
-  end
-  
-  def uncompress
-    raise "error: unsupported extension" unless @method == "zip"
-    system("unzip #{@file_name + '.' + @method}")
   end
   
   def parameters

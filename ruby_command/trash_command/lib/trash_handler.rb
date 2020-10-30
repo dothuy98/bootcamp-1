@@ -7,23 +7,21 @@ class TrashHandler
   
   TRASH_PATH = "#{Dir.home}/.trash"
   CSV_PATH = "#{TRASH_PATH}/trashed_log.csv"
-  HEADER = ['file_name', 'original_path', 'compressed']
+  HEADER = ['file_name', 'original_path']
   HOW_TO_USE = <<~USAGE
   Usage: trash_handler [options] file_name
     -r, --restore trashed_file        restore file to original position from ~/.trash 
     -v, --view                        view file in .trash
-    -c, --compress compress_method  compress file or directory by zip format (default: zip)
     -d, --delete trashed_file         delete file or directory in ~/.trash 
     --delete-all                      delete all file and directory in ~/.trash
 USAGE
   
-  attr_accessor :compress_method, :log, :options
+  attr_accessor :log, :options
   
   def initialize(options: {})
     @trash_log = CsvLog.new(CSV_PATH)
     build_settings
     @options = options
-    @compress_method = options['-c'] || options['--compress']
   end
   
   def run(file_names: [])
@@ -66,16 +64,14 @@ USAGE
     file_names.each do |file_name| 
       raise "same file is exist in ~/.trash. plese rename" unless @trash_log.count_samefile(file_name) == 0
       raise "error: no '#{file_name}' in current directory" unless File.exist?(file_name)
-      trashed_file = TrashedFile.new(file_name, File.expand_path(file_name), @compress_method)
+      trashed_file = TrashedFile.new(file_name, File.expand_path(file_name))
       trashed_file.move_to(TRASH_PATH)
       @trash_log.write(trashed_file.parameters)
-      trashed_file.compress unless @compress_method.nil?
     end
   end
   
   def restore(file_name)
-    trashed_file = TrashedFile.new("#{TRASH_PATH}/#{file_name}", nil, @trash_log.find_matchline(file_name)['compressed'])
-    trashed_file.uncompress unless @trash_log.find_matchline(file_name)['compressed'] == 'nil'
+    trashed_file = TrashedFile.new("#{TRASH_PATH}/#{file_name}", nil)
     trashed_file.move_to(@trash_log.find_matchline(file_name)['original_path'])
     @trash_log.update(@trash_log.select_other_than(file_name), HEADER)
   end
