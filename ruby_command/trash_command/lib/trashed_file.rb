@@ -18,7 +18,7 @@ class TrashedFile
   end
   
   def parameters
-    [@file_name, @file_path, @method.nil? ? 'nil' : @method]
+    [@file_name, @file_path]
   end
   
 end
