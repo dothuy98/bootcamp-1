@@ -6,7 +6,7 @@ class ArgvFormater
     @orders = orders
   end
   
-  def arguments
+  def file_names
     return [] if /^-/.match(@orders.first)
     @orders[0...@orders.find_index { |index| /^-/.match(index) } || @orders.size]
   end

@@ -1,6 +1,6 @@
 require 'csv'
 
-class CsvLog
+class CsvManager
 
   def initialize(file_path)
     @file_path = file_path
