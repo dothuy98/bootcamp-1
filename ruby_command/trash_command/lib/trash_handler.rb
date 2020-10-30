@@ -6,7 +6,7 @@ require 'fileutils'
 class TrashHandler
   
   TRASH_PATH = "#{Dir.home}/.trash"
-  CSV_PATH = "#{TRASH_PATH}/trashed_log.csv"
+  CSV_PATH = "#{TRASH_PATH}/.trashed_log.csv"
   HEADER = ['file_name', 'original_path']
   HOW_TO_USE = <<~USAGE
   Usage: trash_handler [options] file_name

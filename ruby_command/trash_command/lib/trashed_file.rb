@@ -1,7 +1,5 @@
 class TrashedFile
   
-  TRASH_PATH = "#{Dir.home}/.trash"
-  
   attr_accessor :file_name, :file_path
   
   def initialize(file_name, file_path = nil)
