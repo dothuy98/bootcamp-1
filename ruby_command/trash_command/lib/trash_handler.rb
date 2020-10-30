@@ -6,7 +6,7 @@ require 'fileutils'
 class TrashHandler
   
   TRASH_PATH = "#{Dir.home}/.trash"
-  CSV_PATH = "#{TRASH_PATH}/.trashed_log.csv"
+  TRASHED_LOG_PATH = "#{TRASH_PATH}/.trashed_log.csv"
   HEADER = ['file_name', 'original_path']
   HOW_TO_USE = <<~USAGE
   Usage: trash_handler [options] file_name
@@ -19,7 +19,7 @@ USAGE
   attr_accessor :log, :options
   
   def initialize(options: {})
-    @trash_log = CsvLog.new(CSV_PATH)
+    @trash_log = CsvLog.new(TRASHED_LOG_PATH)
     build_settings
     @options = options
   end
@@ -57,7 +57,7 @@ USAGE
   
   def build_settings
     Dir.mkdir(TRASH_PATH) unless Dir.exist?(TRASH_PATH)
-    @trash_log.create(HEADER) unless File.exist?(CSV_PATH)
+    @trash_log.create(HEADER) unless File.exist?(TRASHED_LOG_PATH)
   end
   
   def dump(file_names)
