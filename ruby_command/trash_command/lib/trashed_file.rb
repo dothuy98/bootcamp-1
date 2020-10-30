@@ -19,6 +19,7 @@ class TrashedFile
   end
   
   def compress
+    raise "error: unsupported method" unless @method == 'zip'
     file_name = "#{TRASH_PATH}/#{@file_name}"
     system("zip -r #{file_name + '.' + @method} #{file_name}")
   end
@@ -28,7 +29,7 @@ class TrashedFile
     system("unzip #{@file_name + '.' + @method}")
   end
   
-  def info
+  def parameters
     [@file_name, @file_path, @method.nil? ? 'nil' : @method]
   end
   
