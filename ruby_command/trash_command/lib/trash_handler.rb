@@ -45,6 +45,8 @@ USAGE
         delete(check_exist(option))
       when "--delete-all"
         delete_all
+      when "-h", "--help"
+        puts HOW_TO_USE
       else
         raise "error: unknown predicate `#{parameters}'"
       end
