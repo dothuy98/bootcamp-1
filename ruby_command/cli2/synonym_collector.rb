@@ -3,7 +3,7 @@ require 'net/http'
 require 'openssl'
 require 'json'
 
-class SynonymExtractor
+class SynonymCollector
   API_KEY = 
   HOW_TO_USE = <<~USAGE
   Usage: synonym.rb word1 [word2 ...]
@@ -54,5 +54,5 @@ USAGE
 end
 
 if __FILE__ == $0
-  SynonymExtractor.new(ARGV).run
+  SynonymCollector.new(ARGV).run
 end
