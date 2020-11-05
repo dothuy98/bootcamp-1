@@ -4,7 +4,6 @@ require 'openssl'
 require 'json'
 
 class SynonymCollector
-  API_KEY = 
   HOW_TO_USE = <<~USAGE
   Usage: synonym.rb word1 [word2 ...]
   Outputs synonyms for the inputed words.
@@ -30,9 +29,9 @@ USAGE
     end
   end
   
-  def puts_synonym(inputed_word, synonyms)
+  def puts_words(inputed_word, output_words)
     puts "#{inputed_word} >"
-    puts synonyms.each { |synonym| puts synonym }
+    puts output_words.each { |output_words| puts output_ }
   end
   
   def fetch_synonym(target_word)
