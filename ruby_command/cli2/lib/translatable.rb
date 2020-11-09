@@ -1,8 +1,11 @@
 require './lib/google_gateway'
 
-
 module Translatable
-
+  
+  def translate(text)
+    japanese?(text) ? translate_japanese(text) : translate_english(text)
+  end
+  
   def translate_japanese(text)
     GoogleGateway.new(text).run
   end

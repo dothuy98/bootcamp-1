@@ -1,6 +1,7 @@
 require 'net/http'
 require 'json'
 require 'uri'
+require 'cgi/escape'
 
 class GoogleGateway
   
@@ -23,7 +24,7 @@ class GoogleGateway
     }
     url.query = URI.encode_www_form(params)
     res = Net::HTTP.get_response(url)
-    JSON.parse(res.body)["data"]["translations"].first["translatedText"]
+    CGI.unescapeHTML(JSON.parse(res.body)["data"]["translations"].first["translatedText"])
   end
   
 end

@@ -19,48 +19,55 @@ class DictionaryScanner
     -e, --examples                  search for example sentence.
     -d, --definitions               search for the definition of words.
     -h, --help                      show usage.
-    <file_name>                     translate English sentences into Japanese.
+    <file_name>                     translate English sentences into Japanese or Japanese sentences into English.
 USAGE
 
-  def initialize(words = [])
-    @words = words
-    @option = find_option
+  def initialize(orders = [])
+    @words = reject_option(orders)
+    @option = find_option(orders)
   end
   
   def run
+    return puts HOW_TO_USE if @option == 'help'
     raise HOW_TO_USE if @words.empty?
-    return puts HOW_TO_USE if @words.any? { |word| word == '-h' } || @words.any? { |word| word == '--help' }
-    return puts translate_english(extract_texts(@words)) if include_file?(@words)
+    return puts translate(extract_texts(@words)) if include_file?(@words)
     convert_words
   end
   
-  def find_option
-    return 'synonyms' unless @words.any? { |word| /^-/.match(word) }
-    return @words.find { |word| /^--/.match(word) }.sub(/^--/, '') if @words.find { |word| /^--/.match(word) }
+  def reject_option(orders)
+    orders.reject { |order| /^-/.match(order) }
+  end
+  
+  def find_option(orders)
+    return 'synonyms' unless orders.any? { |order| /^-/.match(order) }
+    return orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if orders.any? { |order| /^--/.match(order) }
     what_to_gets = {
       '-s' => 'synonyms',
       '-a' => 'antonyms',
       '-d' => 'definitions',
-      '-e' => 'examples'
+      '-e' => 'examples',
+      '-h' => 'help'
     }
-    what_to_gets[@words.find { |word| /^-/.match(word) }]
+    what_to_gets[orders.find { |order| /^-/.match(order) }]
   end
   
   def convert_words
     @words.each do |word|
-      next if /^-/.match(word)
-      puts_words(fetch_words(translate_japanese(word))) if japanese?(word)
-      puts_words(fetch_words(word)) unless japanese?(word)
+      japanese?(word) ? puts_words(fetch_words(translate_japanese(word))) : puts_words(fetch_words(word))
     end
   end
   
   def puts_words(words)
+    puts "#{translate_english(words.first)} >>"
     puts "#{words.shift} >"
     return puts "No matching information was found" if words.empty?
-    return words.each do |word|
-      word.each { |key, value| puts "#{key}: #{value}" }
-    end if @option == 'definitions'  
-    words.each { |word| puts word }
+    if @option == 'definitions'
+      words.each do |word|
+        word.each { |key, value| puts "#{key}: #{value}" }
+      end
+    else
+      words.each { |word| puts word }
+    end
   end
   
   def fetch_words(target_word)
