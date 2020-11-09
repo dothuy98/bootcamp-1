@@ -41,14 +41,14 @@ USAGE
   def find_option(orders)
     return 'synonyms' unless orders.any? { |order| /^-/.match(order) }
     return orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if orders.any? { |order| /^--/.match(order) }
-    what_to_gets = {
+    options = {
       '-s' => 'synonyms',
       '-a' => 'antonyms',
       '-d' => 'definitions',
       '-e' => 'examples',
       '-h' => 'help'
     }
-    what_to_gets[orders.find { |order| /^-/.match(order) }]
+    options[orders.find { |order| /^-/.match(order) }]
   end
   
   def convert_words
@@ -61,12 +61,9 @@ USAGE
     puts "#{translate_english(words.first)} >>"
     puts "#{words.shift} >"
     return puts "No matching information was found" if words.empty?
-    if @option == 'definitions'
-      words.each do |word|
-        word.each { |key, value| puts "#{key}: #{value}" }
-      end
-    else
-      words.each { |word| puts word }
+    return words.each { |word| puts word } unless @option == 'definitions'
+    words.each do |word|
+      word.each { |key, value| puts "#{key}: #{value}" }
     end
   end
   
