@@ -6,7 +6,7 @@ class FileCleaner
   end
   
   def find_option
-    return nil if /^-/.match(@orders)
+    return 'move_to_trash' unless /^-/.match(@orders)
   end
   
   def run
@@ -22,11 +22,7 @@ class FileCleaner
   end
   
   def target_path
-    
+    # @optionによって移動先のpathを変える
   end
-  
-  def 
-  
-  
   
 end
