@@ -1,4 +1,4 @@
-module ArgvExtractable
+module ArgvExtractor
   
   class << self
     def select_arguments(argvs)

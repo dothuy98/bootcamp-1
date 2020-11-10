@@ -1,7 +1,7 @@
 require './lib/translatable'
 require './lib/file_filtable'
 require './lib/words_gateway'
-require './lib/argv_extractable'
+require './lib/argv_extractor'
 
 class DictionaryScanner
   
@@ -54,5 +54,5 @@ USAGE
 end
 
 if __FILE__ == $0
-  DictionaryScanner.new(ArgvExtractable.select_arguments(ARGV), ArgvExtractable.find_option(ARGV)).run
+  DictionaryScanner.new(ArgvExtractor.select_arguments(ARGV), ArgvExtractor.find_option(ARGV)).run
 end
