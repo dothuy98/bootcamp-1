@@ -23,8 +23,8 @@ class DictionaryScanner
 USAGE
 
   def initialize(orders = [])
-    @orders = map_ja_to_en(orders)
-    @option = find_option
+    @orders = map_ja_to_en(reject_option(orders))
+    @option = find_option(orders)
   end
   
   def run
@@ -38,9 +38,13 @@ USAGE
     orders.map { |word| japanese?(word) ? translate_japanese(word) : word }
   end
   
-  def find_option
-    return 'synonyms' unless @orders.any? { |order| /^-/.match(order) }
-    return @orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if @orders.any? { |order| /^--/.match(order) }
+  def reject_option(orders)
+    orders.reject { |order| /^-/.match(order) }
+  end
+  
+  def find_option(orders)
+    return 'synonyms' unless orders.any? { |order| /^-/.match(order) }
+    return orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if orders.any? { |order| /^--/.match(order) }
     options = {
       '-s' => 'synonyms',
       '-a' => 'antonyms',
@@ -48,7 +52,7 @@ USAGE
       '-e' => 'examples',
       '-h' => 'help'
     }
-    options[@orders.find { |order| /^-/.match(order) }]
+    options[orders.find { |order| /^-/.match(order) }]
   end
   
   def convert_words
@@ -59,7 +63,6 @@ USAGE
   
   def convert_orders
     @orders.each do |order|
-      next if /^-/.match(order)
       File.file?(order) ? puts_translate(extract_text(order)) : puts_words(WordsGateway.new(order, @option).run)
     end
   end
