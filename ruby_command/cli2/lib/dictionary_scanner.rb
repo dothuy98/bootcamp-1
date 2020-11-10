@@ -55,12 +55,6 @@ USAGE
     options[orders.find { |order| /^-/.match(order) }]
   end
   
-  def convert_words
-    @words.each do |word|
-      puts_words(WordsGateway.new(word, @option).run)
-    end
-  end
-  
   def convert_orders
     @orders.each do |order|
       File.file?(order) ? puts_translate(extract_text(order)) : puts_words(WordsGateway.new(order, @option).run)
