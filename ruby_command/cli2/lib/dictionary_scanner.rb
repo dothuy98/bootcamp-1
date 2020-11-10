@@ -1,6 +1,7 @@
 require './lib/translatable'
 require './lib/file_filtable'
 require './lib/words_gateway'
+require './lib/argv_extractable'
 
 class DictionaryScanner
   
@@ -22,42 +23,21 @@ class DictionaryScanner
     <file_name>                     translate English sentences into Japanese or Japanese sentences into English.
 USAGE
 
-  def initialize(orders = [])
-    @orders = map_ja_to_en(reject_option(orders))
-    @option = find_option(orders)
+  def initialize(arguments, option)
+    @arguments = arguments
+    @option = option
   end
   
   def run
     return puts HOW_TO_USE if @option == 'help'
-    raise HOW_TO_USE if @orders.empty?
+    raise HOW_TO_USE if @arguments.empty?
     raise "error: such option does not exist" if @option.nil?
-    convert_orders
+    convert_arguments
   end
   
-  def map_ja_to_en(orders)
-    orders.map { |word| japanese?(word) ? translate_japanese(word) : word }
-  end
-  
-  def reject_option(orders)
-    orders.reject { |order| /^-/.match(order) }
-  end
-  
-  def find_option(orders)
-    return 'synonyms' unless orders.any? { |order| /^-/.match(order) }
-    return orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if orders.any? { |order| /^--/.match(order) }
-    options = {
-      '-s' => 'synonyms',
-      '-a' => 'antonyms',
-      '-d' => 'definitions',
-      '-e' => 'examples',
-      '-h' => 'help'
-    }
-    options[orders.find { |order| /^-/.match(order) }]
-  end
-  
-  def convert_orders
-    @orders.each do |order|
-      File.file?(order) ? puts_translate(extract_text(order)) : puts_words(WordsGateway.new(order, @option).run)
+  def convert_arguments
+    @arguments.each do |argument|
+      File.file?(argument) ? puts_translate(extract_text(argument)) : puts_words(WordsGateway.new(translate_japanese(argument), @option).run)
     end
   end
   
@@ -74,5 +54,5 @@ USAGE
 end
 
 if __FILE__ == $0
-  DictionaryScanner.new(ARGV).run
+  DictionaryScanner.new(ArgvExtractable.select_arguments(ARGV), ArgvExtractable.find_option(ARGV)).run
 end
