@@ -24,12 +24,13 @@ USAGE
 
   def initialize(orders = [])
     @orders = map_ja_to_en(orders)
-    @option = find_option(orders)
+    @option = find_option
   end
   
   def run
     return puts HOW_TO_USE if @option == 'help'
     raise HOW_TO_USE if @orders.empty?
+    raise "error: such option does not exist" if @option.nil?
     convert_orders
   end
   
@@ -37,9 +38,9 @@ USAGE
     orders.map { |word| japanese?(word) ? translate_japanese(word) : word }
   end
   
-  def find_option(orders)
-    return 'synonyms' unless orders.any? { |order| /^-/.match(order) }
-    return orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if orders.any? { |order| /^--/.match(order) }
+  def find_option
+    return 'synonyms' unless @orders.any? { |order| /^-/.match(order) }
+    return @orders.find { |order| /^--/.match(order) }.sub(/^--/, '') if @orders.any? { |order| /^--/.match(order) }
     options = {
       '-s' => 'synonyms',
       '-a' => 'antonyms',
@@ -47,7 +48,7 @@ USAGE
       '-e' => 'examples',
       '-h' => 'help'
     }
-    options[orders.find { |order| /^-/.match(order) }]
+    options[@orders.find { |order| /^-/.match(order) }]
   end
   
   def convert_words
