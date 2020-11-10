@@ -2,8 +2,9 @@ require './lib/google_gateway'
 
 module Translatable
   
-  def translate(text)
-    japanese?(text) ? translate_japanese(text) : translate_english(text)
+  def puts_translate(text)
+    return puts translate_japanese(text) if japanese?(text)
+    puts translate_english(text)
   end
   
   def translate_japanese(text)
@@ -12,7 +13,7 @@ module Translatable
   
   def translate_english(text)
     GoogleGateway.new(text).run(target: 'ja', source: 'en')
-  end    
+  end
   
   def japanese?(target_word)
     /(?:\p{Hiragana}|\p{Katakana}|[一-龠々])/.match?(target_word)

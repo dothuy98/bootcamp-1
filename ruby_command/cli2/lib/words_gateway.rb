@@ -5,9 +5,9 @@ require 'json'
 
 class WordsGateway
   
-  def initialize(target_word, what_to_get)
+  def initialize(target_word, option_name)
     @target_word = target_word
-    @what_to_get = what_to_get
+    @option_name = option_name
   end
   
   def run
@@ -16,7 +16,7 @@ class WordsGateway
   end
   
   def request_api
-    url = URI("https://rapidapi.p.rapidapi.com/words/#{@target_word}/#{@what_to_get}")
+    url = URI("https://rapidapi.p.rapidapi.com/words/#{@target_word}/#{@option_name}")
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE

@@ -23,19 +23,18 @@ class DictionaryScanner
 USAGE
 
   def initialize(orders = [])
-    @words = reject_option(orders)
+    @orders = map_ja_to_en(orders)
     @option = find_option(orders)
   end
   
   def run
     return puts HOW_TO_USE if @option == 'help'
-    raise HOW_TO_USE if @words.empty?
-    return puts translate(extract_texts(@words)) if include_file?(@words)
-    convert_words
+    raise HOW_TO_USE if @orders.empty?
+    convert_orders
   end
   
-  def reject_option(orders)
-    orders.reject { |order| /^-/.match(order) }
+  def map_ja_to_en(orders)
+    orders.map { |word| japanese?(word) ? translate_japanese(word) : word }
   end
   
   def find_option(orders)
@@ -53,7 +52,14 @@ USAGE
   
   def convert_words
     @words.each do |word|
-      japanese?(word) ? puts_words(fetch_words(translate_japanese(word))) : puts_words(fetch_words(word))
+      puts_words(WordsGateway.new(word, @option).run)
+    end
+  end
+  
+  def convert_orders
+    @orders.each do |order|
+      next if /^-/.match(order)
+      File.file?(order) ? puts_translate(extract_text(order)) : puts_words(WordsGateway.new(order, @option).run)
     end
   end
   
@@ -65,10 +71,6 @@ USAGE
     words.each do |word|
       word.each { |key, value| puts "#{key}: #{value}" }
     end
-  end
-  
-  def fetch_words(target_word)
-    WordsGateway.new(target_word, @option).run
   end
   
 end
