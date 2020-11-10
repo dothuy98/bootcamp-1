@@ -23,7 +23,7 @@ class WordsGateway
     request = Net::HTTP::Get.new(url)
     request["x-rapidapi-key"] = ENV['WORDS_API_KEY']
     request["x-rapidapi-host"] = 'wordsapiv1.p.rapidapi.com'
-    JSON.parse(http.request(request).read_body).values.flatten!
+    JSON.parse(http.request(request).read_body).values.flatten
   end
   
 end
