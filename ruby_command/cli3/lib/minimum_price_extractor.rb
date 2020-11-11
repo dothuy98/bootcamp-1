@@ -26,10 +26,10 @@ HOW_TO_USE
   def fetch_goods_prices(target_url)
     goods_document = Nokogiri.HTML(URI.open(target_url))
     goods_document.xpath('/html/body/div[1]/main/div[1]/section/div[2]/section/a').each_with_index do |target_goods, index|
+      break if index == MAX_GOODS
       puts target_goods.xpath('div/h3').text
       puts target_goods.xpath('div/div/div[1]').text
       puts URI.join(target_url, target_goods.attribute('href').value)
-      break if index == MAX_GOODS
     end
   end
   
