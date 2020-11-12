@@ -5,42 +5,49 @@ require './lib/argv_extractor'
 class MercariScraper
   
   USAGE = <<~HOW_TO_USE
-  Usage: ruby ./lib/minimum_price_extractor.rb goods_keyword1 [goods_keyword2 ...]
-  Outputs the price and URL of the goods in Mercari
+  Usage: ruby ./lib/minimum_price_extractor.rb product_keyword1 [product_keyword2 ...]
+  Outputs the price and URL of the product in Mercari
   Option: 
     -h, --help            display usage.
     -a, --asc             sort in ascending order of price.
     -d, --desc            sort in descending order of price.
 HOW_TO_USE
-  MAX_GOODS = 10
+  MAX_PRODUCT = 10
+  MERCARI_URL = 'https://www.mercari.com/jp/search/?status_on_sale=1'
   
-  def initialize(goods_keywords, option)
-    @goods_keywords = goods_keywords
+  def initialize(product_keywords, option)
+    @product_keywords = product_keywords
     @option = option
   end
   
   def run
     return puts USAGE if @option == 'help'
-    raise "Please input one or more arguments" if @goods_keywords.empty?
+    raise "Please input one or more product_keywords" if @product_keywords.empty?
     
-    scrape_goods_prices(create_url)
+    scrape_product_prices(create_url)
   end
   
   def create_url
-    mercari_url = 'https://www.mercari.com/jp/search/?status_on_sale=1'
-    mercari_url += '&sort_order=price_asc' if @option == 'asc'
-    mercari_url += '&sort_order=price_desc' if @option == 'desc'
-    URI.encode("#{mercari_url}&keyword=#{@goods_keywords.join('+')}")
+    URI.encode("#{sorted_url || MERCARI_URL}&keyword=#{@product_keywords.join('+')}")
   end
   
-  def scrape_goods_prices(target_url)
-    goods_document = Nokogiri.HTML(URI.open(target_url))
-    goods_document.xpath('/html/body/div[1]/main/div[1]/section/div[2]/section/a').each_with_index do |target_goods, index|
-      break if index == MAX_GOODS
-      puts target_goods.xpath('div/h3').text
-      puts target_goods.xpath('div/div/div[1]').text
-      puts URI.join(target_url, target_goods.attribute('href').value)
+  def sorted_url
+    @option == 'asc' ? "#{MERCARI_URL}&sort_order=price_asc" : "#{MERCARI_URL}&sort_order=price_desc" if /asc|desc/.match(@option)
+  end  
+  
+  def scrape_product_prices(target_url)
+    products_document = Nokogiri.HTML(URI.open(target_url))
+    products_document.xpath('/html/body/div[1]/main/div[1]/section/div[2]/section/a').each_with_index do |target_product, index|
+      break if index == MAX_PRODUCT
+      
+      puts_product(target_product)
     end
+  end
+  
+  def puts_product(product_xpath)
+    puts product_xpath.xpath('div/h3').text
+    puts product_xpath.xpath('div/div/div[1]').text
+    puts URI.join(MERCARI_URL, product_xpath.attribute('href').value)
   end
   
 end
