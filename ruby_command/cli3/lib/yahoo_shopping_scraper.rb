@@ -1,0 +1,3 @@
+class YahooShoppingScraper
+  
+end

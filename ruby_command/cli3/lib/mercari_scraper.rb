@@ -4,27 +4,15 @@ require './lib/argv_extractor'
 
 class MercariScraper
   
-  USAGE = <<~HOW_TO_USE
-  Usage: ruby ./lib/minimum_price_extractor.rb product_keyword1 [product_keyword2 ...]
-  Outputs the price and URL of the product in Mercari
-  Option: 
-    -h, --help            display usage.
-    -a, --asc             sort in ascending order of price.
-    -d, --desc            sort in descending order of price.
-HOW_TO_USE
-  MAX_PRODUCT = 10
   MERCARI_URL = 'https://www.mercari.com/jp/search/?status_on_sale=1'
   
-  def initialize(product_keywords, option)
+  def initialize(product_keywords, options)
     @product_keywords = product_keywords
-    @option = option
+    @options = options
   end
   
   def run
-    return puts USAGE if @option == 'help'
-    raise "Please input one or more product_keywords" if @product_keywords.empty?
-    
-    scrape_product_prices(create_url)
+    scrape_products(create_url)
   end
   
   def create_url
@@ -32,27 +20,39 @@ HOW_TO_USE
   end
   
   def sorted_url
-    return nil unless /asc|desc/.match(@option)
-    @option == 'asc' ? "#{MERCARI_URL}&sort_order=price_asc" : "#{MERCARI_URL}&sort_order=price_desc"
+    return nil unless ['asc', 'desc', 'expensive', 'cheap'].any? { |key| @options[key] }  
+    
+    ['asc', 'cheap'].any? { |key| @options[key] }  ? "#{MERCARI_URL}&sort_order=price_asc" : "#{MERCARI_URL}&sort_order=price_desc"
   end  
   
-  def scrape_product_prices(target_url)
+  def scrape_products(target_url)
     products_document = Nokogiri.HTML(URI.open(target_url))
-    products_document.xpath('/html/body/div[1]/main/div[1]/section/div[2]/section/a').each_with_index do |target_product, index|
-      break if index == MAX_PRODUCT
+    mercari_products = []
+    products_document.xpath('/html/body/div[1]/main/div[1]/section/div[2]/section/a').each.with_index do |target_product, index|
+      break if index == (@options['max_count'] || 10)
+      #break if ['expensive', 'cheap'].any? { |key| @options[key] } && scrape_price(target_product) != boundary_price(products_document) 
       
-      puts_product(target_product)
+      mercari_products.push({'price' => scrape_price(target_product), 
+                             'headline' => scrape_headline(target_product), 
+                             'url' => scrape_url(target_product)})
     end
+    mercari_products
   end
   
-  def puts_product(product_xpath)
-    puts product_xpath.xpath('div/h3').text
-    puts product_xpath.xpath('div/div/div[1]').text
-    puts URI.join(MERCARI_URL, product_xpath.attribute('href').value)
+  def scrape_headline(product_xpath)
+    product_xpath.xpath('div/h3').text
   end
   
-end
-
-if __FILE__ == $0
-  MercariScraper.new(ArgvExtractor.select_keywords(ARGV), ArgvExtractor.find_option(ARGV)).run
+  def scrape_price(product_xpath)
+    product_xpath.xpath('div/div/div[1]').text.gsub(/\D/,'')
+  end
+  
+  def scrape_url(product_xpath)
+    URI.join(MERCARI_URL, product_xpath.attribute('href').value)
+  end
+  
+  def boundary_price(document)
+    #document.xpath('/html/body/div[1]/main/div[1]/section/div[2]/section[1]/a/div/div/div[1]').text.gsub(/\D/,'')
+  end
+  
 end

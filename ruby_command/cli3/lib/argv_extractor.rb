@@ -2,19 +2,27 @@ module ArgvExtractor
 
   class << self
     def select_keywords(argvs)
-      argvs.select { |argv| !/^-/.match(argv) }
+      argvs.reject.with_index do |argv, index|
+        /^-/.match(argv) || (/^-/.match(argvs[index - 1]) && index != 0)
+      end
     end
 
-    def find_option(argvs)
-      return nil unless argvs.any? { |argv| /^-/.match(argv) }
-      return argvs.find { |argv| /^--/.match(argv) }.sub(/^--/, '') if argvs.any? { |argv| /^--/.match(argv) }
+    def select_options(argvs)
+      return {} unless argvs.any? { |argv| /^-/.match(argv) }
       
-      options = {
-        '-a' => 'asc',
-        '-d' => 'desc',
-        '-h' => 'help'
-      }
-      options[argvs.find { |argv| /^-/.match(argv) }]
+      options = {}
+      argvs.each_with_index do |argv, index|
+        next unless /^-/.match(argv)
+        
+        options['asc'] = true if argv == '-a' || argv == '--asc'
+        options['desc'] = true if argv == '-d' || argv == '--desc'
+        options['help'] = true if argv == '-h' || argv == '--help'
+        options['cheap'] = true if argv == '-c' || argv == '--cheap'
+        options['expensive'] = true if argv == '-e' || argv == '--expensive'
+        options['max_count'] = argvs[index + 1].to_i if argv == '-n' || argv == '--max_count'
+        options['not'] = argvs[index + 1] if argv == '-!' || argv == '--not'
+      end
+      options
     end
   end
 
