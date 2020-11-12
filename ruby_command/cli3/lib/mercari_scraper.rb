@@ -32,7 +32,8 @@ HOW_TO_USE
   end
   
   def sorted_url
-    @option == 'asc' ? "#{MERCARI_URL}&sort_order=price_asc" : "#{MERCARI_URL}&sort_order=price_desc" if /asc|desc/.match(@option)
+    return nil unless /asc|desc/.match(@option)
+    @option == 'asc' ? "#{MERCARI_URL}&sort_order=price_asc" : "#{MERCARI_URL}&sort_order=price_desc"
   end  
   
   def scrape_product_prices(target_url)
