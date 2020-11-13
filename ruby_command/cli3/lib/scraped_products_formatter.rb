@@ -42,11 +42,9 @@ HOW_TO_USE
   end
   
   def format_products(products)
-    sort_prices(products)
-    sort_prices(products).each_with_index do |product_group, index|
+    sort_prices(reject_products(products)).each_with_index do |product_group, index|
       break if index == (@options['max_count'] || 10)
       break if ['expensive', 'cheap'].any? { |key| @options[key] } && boundary_price(products) != product_group['price']
-      next if @options['not'] && exclude_word?(product_group)
       
       puts_product(product_group)
     end
@@ -63,8 +61,12 @@ HOW_TO_USE
     @options['cheap'] ? products.map{ |product| product['price'] }.min : products.map{ |product| product['price'] }.max
   end
   
-  def exclude_word?(product)
-    /#{create_exclude_pattern}/.match(product['headline'])
+  def reject_products(products)
+    return products unless @options['not']
+
+    products.reject do |product|
+      /#{create_exclude_pattern}/.match(product['headline'])
+    end
   end
   
   def create_exclude_pattern
