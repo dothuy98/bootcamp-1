@@ -1,14 +1,14 @@
-require './lib/mercari_scraper.rb'
-require './lib/rakuma_scraper.rb'
-require './lib/rakuten_scraper.rb'
-require './lib/yahoo_shopping_scraper.rb'
+require './lib/mercari_scraper'
+require './lib/rakuma_scraper'
+require './lib/yahoo_shopping_scraper'
+require './lib/argv_extractor'
 
 class ScrapedProductsFormatter
   
   USAGE = <<~HOW_TO_USE
   Usage: ruby ./lib/minimum_price_extractor.rb product_keyword1 [product_keyword2 ...] [option ...]
   
-  Outputs the prices, headlines, URL of the product in mercari, rakuma, yahoo shopping and rakuten.
+  Outputs the prices, headlines, URL of the product in mercari, rakuma and yahoo shopping.
   
   Option: 
     -h, --help                    display usage.
@@ -36,11 +36,13 @@ HOW_TO_USE
   def collect_products
     [
     *MercariScraper.new(@product_keywords, @options).run,
-    *RakumaScraper.new(@product_keywords, @options).run
+    *RakumaScraper.new(@product_keywords, @options).run,
+    *YahooShoppingScraper.new(@product_keywords, @options).run,
     ]
   end
   
   def format_products(products)
+    sort_prices(products)
     sort_prices(products).each_with_index do |product_group, index|
       break if index == (@options['max_count'] || 10)
       break if ['expensive', 'cheap'].any? { |key| @options[key] } && boundary_price(products) != product_group['price']
@@ -51,14 +53,14 @@ HOW_TO_USE
   end
   
   def sort_prices(products)
-    return products unless ['asc', 'desc', 'expensive', 'cheap'].any? { |key| @options[key] }
+    # shuffle is to prevent only metcari from being displayed
+    return products.shuffle unless ['asc', 'desc', 'expensive', 'cheap'].any? { |key| @options[key] }
     
     ['asc', 'cheap'].any? { |key| @options[key] } ? products.sort_by{ |product| product['price'].to_i } : products.sort_by{ |product| - product['price'].to_i }
   end
   
   def boundary_price(products)
-    return products.map{ |product| product['price'] }.min if @options['cheap']
-    products.map{ |product| product['price'] }.max
+    @options['cheap'] ? products.map{ |product| product['price'] }.min : products.map{ |product| product['price'] }.max
   end
   
   def exclude_word?(product)
@@ -70,7 +72,13 @@ HOW_TO_USE
   end
   
   def puts_product(product_group)
-    product_group.values.each { |product| puts product }
+    product_group.each do |product_key, product_value|
+      if product_key == 'price'
+        puts "#{product_value}円"
+      else
+        puts product_value
+      end
+    end
   end
 end
 

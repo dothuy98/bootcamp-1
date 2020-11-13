@@ -1,3 +1,6 @@
+require 'nokogiri'
+require 'open-uri'
+
 class RakumaScraper
   
   RAKUMA_URL = 'https://fril.jp/s?transaction=selling'
@@ -23,15 +26,11 @@ class RakumaScraper
   
   def scrape_products(target_url)
     products_document = Nokogiri.HTML(URI.open(target_url))
-    rakuma_products = []
-    products_document.xpath('/html/body/div[3]/div/div/div/div/div/div[2]/section/div[2]/section/div/div/div[2]').each_with_index do |target_product, index|
-      break if index == (@options['max_count'] || 10)
-      
-      rakuma_products.push({'price' => scrape_price(target_product), 
-                            'headline' => scrape_headline(target_product), 
-                            'url' => scrape_url(target_product)})
+    products_document.xpath('/html/body/div[3]/div/div/div/div/div/div[2]/section/div[2]/section/div/div/div[2]').map.with_index do |target_product, index|
+      {'price' => scrape_price(target_product), 
+       'headline' => scrape_headline(target_product), 
+       'url' => scrape_url(target_product)}
     end
-    rakuma_products
   end
   
   def scrape_headline(product_xpath)
