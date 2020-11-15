@@ -32,9 +32,11 @@ HOW_TO_USE
   end
   
   def collect_products
-    exclude_NOT_search_from([*MercariScraper.new(@product_keywords, @options).run,
-     *RakumaScraper.new(@product_keywords, @options).run,
-     *YahooShoppingScraper.new(@product_keywords, @options).run])
+    exclude_NOT_search_from(
+      [*MercariScraper.new(@product_keywords, @options).run,
+      *RakumaScraper.new(@product_keywords, @options).run,
+      *YahooShoppingScraper.new(@product_keywords, @options).run]
+    )
   end
   
   def extract_products(products)
